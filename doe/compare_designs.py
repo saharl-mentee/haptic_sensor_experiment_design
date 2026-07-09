@@ -74,7 +74,10 @@ for name, builder in ADAPTED.items():
         designs[f"{name} +int"] = (d, True)
 
 designs["D-opt 20"] = (d_optimal(20, include_interaction=False), False)
+designs["D-opt 20 +int"] = (d_optimal(20, include_interaction=True), True)
+designs["D-opt 16"] = (d_optimal(16, include_interaction=False), False)
 d22_me = d_optimal(22, include_interaction=False)
+designs["D-opt 25"] = (d_optimal(25, include_interaction=False), False)
 designs["D-opt 25 ME +3rep"] = (add_replicates(d22_me, 3, include_interaction=False), False)
 d22_int = d_optimal(22, include_interaction=True)
 designs["D-opt 22 +int"] = (d22_int, True)

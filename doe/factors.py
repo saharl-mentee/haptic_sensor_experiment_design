@@ -29,6 +29,7 @@ FACTORS = {
     # a small paired comparison against the winning configuration.
     # "coil": ["C1", "C2", "C3", "C4", "C5"],
     "coil": ["C1", "C2", "C3", "C4"],
+    # "coil": ["C1", "C2", "C3"],
 
     # 3 candidate foam materials.
     "foam_material": ["FoamA", "FoamB", "FoamC"],

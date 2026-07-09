@@ -4,6 +4,9 @@ Taguchi L18,18,main effects,10,8,0,yes,97.7,1.33,0.5,coil:3-6  foamMat:6-6  thic
 Taguchi L25,25,main effects,10,15,0,yes,93.8,1.2,0.41,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
 Taguchi L25 +int,25,ME+interaction,14,11,0,yes,79.9,8.21,0.59,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
 D-opt 20,20,main effects,10,10,0,yes,97.4,1.82,0.54,coil:4-6  foamMat:6-7  thick:6-7  metal:6-8
+D-opt 20 +int,20,ME+interaction,14,6,0,yes,89.8,5.97,0.57,coil:5-5  foamMat:6-7  thick:6-7  metal:6-7
+D-opt 16,16,main effects,10,6,0,yes,96.2,1.5,0.52,coil:3-5  foamMat:5-6  thick:5-6  metal:5-6
+D-opt 25,25,main effects,10,15,0,yes,99.0,1.59,0.51,coil:6-7  foamMat:8-9  thick:8-9  metal:8-9
 D-opt 25 ME +3rep,25,main effects,10,15,3,yes,98.5,1.54,0.56,coil:6-7  foamMat:7-9  thick:8-9  metal:8-9
 D-opt 22 +int,22,ME+interaction,14,8,0,yes,92.0,4.71,0.58,coil:5-6  foamMat:7-8  thick:7-8  metal:7-8
 D-opt 25 +int +3rep,25,ME+interaction,14,11,3,yes,90.6,4.67,0.59,coil:5-7  foamMat:8-9  thick:7-9  metal:8-9
