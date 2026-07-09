@@ -27,7 +27,8 @@ FACTORS = {
     # 5 truly different coil geometries. The 2 "mirror winding"
     # variants are NOT here on purpose: they will be tested later as
     # a small paired comparison against the winning configuration.
-    "coil": ["C1", "C2", "C3", "C4", "C5"],
+    # "coil": ["C1", "C2", "C3", "C4", "C5"],
+    "coil": ["C1", "C2", "C3", "C4"],
 
     # 3 candidate foam materials.
     "foam_material": ["FoamA", "FoamB", "FoamC"],

@@ -7,9 +7,10 @@ computer-optimized (D-optimal) designs on equal footing.
 
 ## The experiment in one paragraph
 
-Four design factors: **coil configuration** (5 geometries), **foam material**
+Four design factors: **coil configuration** (5 geometries nominally — the
+toolkit adapts to whatever count `doe/factors.py` defines), **foam material**
 (3), **foam thickness** (3), **metal sheet** (3 material+thickness options).
-Building every combination = 135 sensors; the budget is ~20–25. Each build is
+Building every combination = 135 sensors (with 5 coils); the budget is ~20–25. Each build is
 tested on the mass jig (mass sweep, 3 cycles) and collapses to a few response
 numbers — sensitivity (Δf/ΔF), dynamic range, repeatability. ANOVA on those
 responses then says which factor levels matter. **The design question is which
@@ -38,7 +39,7 @@ and re-run. **To score a design of your own** (e.g. a hand-tweaked CSV):
 |---|---|
 | `doe/factors.py` | The experiment definition + power-simulation assumptions. **Edit this one.** |
 | `doe/model_matrix.py` | Design table → ANOVA model matrix; degrees-of-freedom bookkeeping |
-| `doe/taguchi.py` | Standard L18/L25 orthogonal arrays, adapted to the 5×3×3×3 pattern |
+| `doe/taguchi.py` | Standard L16/L18/L25 orthogonal arrays, adapted to the current factor pattern (L16 suits 4 coils, L25 suits 5, L18 up to 6) |
 | `doe/optimal.py` | D-optimal (Fedorov exchange) design search, with replicate support |
 | `doe/metrics.py` | The common scorecard: error df, balance, D-efficiency, VIF, correlation |
 | `doe/power_sim.py` | Monte-Carlo statistical power for any design |
@@ -67,7 +68,7 @@ layer's stiffness) — coil×metal etc. are sacrificed by every ≤25-run design
 **Orthogonality.** A design is orthogonal when every pair of factor levels
 co-occurs equally often — then averaging over one factor cancels the others
 exactly, and effects separate perfectly. Taguchi arrays are pre-tabulated
-orthogonal designs; ours don't fit the 5×3×3×3 pattern exactly, so standard
+orthogonal designs; none fits our factor pattern exactly, so standard
 adaptation tricks (column merge, dummy level) trade away a little balance.
 
 **D-optimality.** When no orthogonal array fits, search all 135 candidates for

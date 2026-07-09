@@ -11,9 +11,9 @@ C3,FoamC,T1,MetalC
 C4,FoamA,T3,MetalC
 C4,FoamB,T1,MetalA
 C4,FoamC,T2,MetalB
-C5,FoamA,T2,MetalC
-C5,FoamB,T3,MetalA
-C5,FoamC,T1,MetalB
-C1,FoamA,T3,MetalB
-C1,FoamB,T1,MetalC
-C1,FoamC,T2,MetalA
+C1,FoamA,T2,MetalC
+C1,FoamB,T3,MetalA
+C1,FoamC,T1,MetalB
+C2,FoamA,T3,MetalB
+C2,FoamB,T1,MetalC
+C2,FoamC,T2,MetalA
