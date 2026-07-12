@@ -49,17 +49,25 @@ import pandas as pd
 from factors import FACTORS
 
 
-def _cyclic_map(levels: list, n_slots: int, array_name: str) -> list:
+def _cyclic_map(levels: list, n_slots: int, array_name: str,
+                what: str = "a factor") -> list:
     """
-    Map n_slots array codes onto len(levels) real levels by cycling:
-    slot i -> levels[i % k]. The slots beyond k are the 'dummy'
-    repeats — those levels simply get built more often.
+    Map an array column's n_slots codes onto len(levels) real levels by
+    cycling: slot i -> levels[i % k]. This is the general dummy-level
+    rule and it works for ANY level count k <= n_slots:
+      * k == n_slots -> every level once (perfectly balanced).
+      * k <  n_slots -> the first (n_slots - k) levels repeat (built
+        more often) — cycling guarantees EVERY real level still appears.
+      * k >  n_slots -> impossible: the column cannot carry that many
+        levels, so we refuse loudly instead of silently dropping one.
     """
     k = len(levels)
     if k > n_slots:
         raise ValueError(
-            f"{array_name} has only {n_slots} slots for the coil but "
-            f"factors.py defines {k} coils — use a larger array or D-optimal.")
+            f"{array_name}: {what} has {k} levels but this array only "
+            f"offers {n_slots} column-slots for it — use a larger array "
+            f"(L16<L18<L25) or the D-optimal designs, which handle any "
+            f"level count.")
     return [levels[i % k] for i in range(n_slots)]
 
 
@@ -149,60 +157,59 @@ def check_orthogonality(array: np.ndarray) -> bool:
     return True
 
 
+def _build_design(columns: dict, slots: dict, array_name: str) -> pd.DataFrame:
+    """
+    Turn array code-columns into a design table. `columns[factor]` is
+    that factor's code vector from the array; `slots[factor]` is how
+    many levels that array column carries. Each factor is mapped with
+    _cyclic_map, so ANY level count in factors.py works (or fails loudly
+    if a factor has more levels than its column can hold).
+    """
+    maps = {f: _cyclic_map(FACTORS[f], slots[f], array_name,
+                           "the coil" if f == "coil" else f)
+            for f in columns}
+    return pd.DataFrame({f: [maps[f][v] for v in codes]
+                         for f, codes in columns.items()})
+
+
 def design_l16() -> pd.DataFrame:
     """
-    Adapt L16 to our factors:
-      coil <- column 0 (native fit for 4 coils: 4 runs each;
-              fewer coils -> cyclic dummy repeats)
-      each 3-level factor <- its own 4-level column with the
-      dummy-level map [0,1,2,0]: level 1 appears 8x, levels 2,3 4x.
+    Adapt L16 (four 4-level columns) to our factors. Coil is the natural
+    4-level fit; foam/thickness/metal are dummy-leveled into 4-level
+    columns (with 3 levels: one level built 2x more). Any level count
+    <= 4 per factor is handled by the cyclic dummy rule.
     """
     arr = l16_array()
-    coil_map = _cyclic_map(FACTORS["coil"], 4, "L16")
-    dummy = [0, 1, 2, 0]   # 4-level code -> 3-level index
-    return pd.DataFrame({
-        "coil":           [coil_map[v] for v in arr[:, 0]],
-        "foam_material":  [FACTORS["foam_material"][dummy[v]] for v in arr[:, 1]],
-        "foam_thickness": [FACTORS["foam_thickness"][dummy[v]] for v in arr[:, 2]],
-        "metal":          [FACTORS["metal"][dummy[v]] for v in arr[:, 3]],
-    })
+    cols = {"coil": arr[:, 0], "foam_material": arr[:, 1],
+            "foam_thickness": arr[:, 2], "metal": arr[:, 3]}
+    return _build_design(cols, {f: 4 for f in cols}, "L16")
 
 
 def design_l18() -> pd.DataFrame:
     """
-    Adapt L18 to our factors:
-      coil <- columns 0 & 1 merged into one 6-level column; coil
-              slots beyond the real coils repeat coils cyclically
-              (5 coils -> C1 repeated; 4 coils -> C1 and C2 repeated)
-      foam_material, foam_thickness, metal <- columns 2, 3, 4
+    Adapt L18 to our factors: coil <- columns 0 & 1 merged into one
+    6-level column (dummy repeats beyond the real coils); foam/thickness/
+    metal <- the 3-level columns 2, 3, 4. Coil takes <= 6 levels, the
+    others <= 3.
     """
     merged = L18[:, 0] * 3 + L18[:, 1]          # 6 levels: 0..5
-    coil_map = _cyclic_map(FACTORS["coil"], 6, "L18")
-    return pd.DataFrame({
-        "coil":           [coil_map[v] for v in merged],
-        "foam_material":  [FACTORS["foam_material"][v] for v in L18[:, 2]],
-        "foam_thickness": [FACTORS["foam_thickness"][v] for v in L18[:, 3]],
-        "metal":          [FACTORS["metal"][v] for v in L18[:, 4]],
-    })
+    cols = {"coil": merged, "foam_material": L18[:, 2],
+            "foam_thickness": L18[:, 3], "metal": L18[:, 4]}
+    slots = {"coil": 6, "foam_material": 3, "foam_thickness": 3, "metal": 3}
+    return _build_design(cols, slots, "L18")
 
 
 def design_l25() -> pd.DataFrame:
     """
-    Adapt L25 to our factors:
-      coil <- column 0 (native fit for 5 coils: 5 runs each;
-              fewer coils -> cyclic dummy repeats)
-      each 3-level factor <- its own 5-level column with the
-      dummy-level map [0,1,2,0,1]: levels 1,2 appear 10x, level 3 5x.
+    Adapt L25 (six 5-level columns) to our factors. Coil is the natural
+    5-level fit; foam/thickness/metal are dummy-leveled into 5-level
+    columns (with 3 levels: two levels built 2x more). Any level count
+    <= 5 per factor is handled by the cyclic dummy rule.
     """
     arr = l25_array()
-    coil_map = _cyclic_map(FACTORS["coil"], 5, "L25")
-    dummy = [0, 1, 2, 0, 1]   # 5-level code -> 3-level index
-    return pd.DataFrame({
-        "coil":           [coil_map[v] for v in arr[:, 0]],
-        "foam_material":  [FACTORS["foam_material"][dummy[v]] for v in arr[:, 1]],
-        "foam_thickness": [FACTORS["foam_thickness"][dummy[v]] for v in arr[:, 2]],
-        "metal":          [FACTORS["metal"][dummy[v]] for v in arr[:, 3]],
-    })
+    cols = {"coil": arr[:, 0], "foam_material": arr[:, 1],
+            "foam_thickness": arr[:, 2], "metal": arr[:, 3]}
+    return _build_design(cols, {f: 5 for f in cols}, "L25")
 
 
 # The adapted designs, keyed by name, with their run counts — used by

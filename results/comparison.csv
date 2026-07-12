@@ -15,4 +15,4 @@ D-opt 28 +int +3rep,28,ME+interaction,21,7,3,yes,93.5,15.44,0.55,coil:8-12  foam
 D-opt 35,35,main effects,9,26,0,yes,98.1,1.47,0.55,coil:10-14  foamMat:11-12  thick:11-12  metal:10-14
 D-opt 35 +int,35,ME+interaction,21,14,0,yes,95.9,11.12,0.6,coil:10-14  foamMat:11-12  thick:11-12  metal:10-14
 Full factorial (ref),81,ME+interaction,21,60,0,yes,100.0,9.33,0.5,coil:27-27  foamMat:27-27  thick:27-27  metal:27-27
-D-opt 31 aug +int,31,ME+interaction,21,10,0,yes,97.2,10.75,0.56,coil:10-11  foamMat:9-12  thick:10-11  metal:9-12
+D-opt 28 aug +int,28,ME+interaction,21,7,0,yes,94.3,9.24,0.59,coil:8-11  foamMat:9-10  thick:9-10  metal:9-10

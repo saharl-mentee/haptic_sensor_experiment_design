@@ -138,7 +138,7 @@ augmentation_path(False, [16, 20, 25], "Main-effects model:  16 -> 20 -> 25")
 # Interaction staged path — needs N > model params, so scale it to
 # however many interactions are enabled in factors.py right now.
 print()
-p_int = model_df(True)
+p_int = model_df(False)
 lo = max(20, p_int + 2)             # first stage: estimable, with error df
 int_stages = [lo, lo + 4, lo + 8]
 if int_stages[0] <= 28:
