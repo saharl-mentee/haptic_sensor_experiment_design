@@ -28,8 +28,8 @@ FACTORS = {
     # variants are NOT here on purpose: they will be tested later as
     # a small paired comparison against the winning configuration.
     # "coil": ["C1", "C2", "C3", "C4", "C5"],
-    "coil": ["C1", "C2", "C3", "C4"],
-    # "coil": ["C1", "C2", "C3"],
+    # "coil": ["C1", "C2", "C3", "C4"],
+    "coil": ["C1", "C2", "C3"],
 
     # 3 candidate foam materials.
     "foam_material": ["FoamA", "FoamB", "FoamC"],
@@ -48,7 +48,7 @@ FACTORS = {
 }
 
 # ---------------------------------------------------------------
-# Which interaction do we consider physically plausible enough to
+# Which interactions do we consider physically plausible enough to
 # spend runs on?
 #
 # An INTERACTION means: "the effect of one factor depends on the
@@ -56,12 +56,27 @@ FACTORS = {
 # foam material but thick foam is best for a soft one. If that is
 # true and we only fit "main effects", we would pick a wrong combo.
 #
-# foam_material x foam_thickness is the natural candidate: both set
-# the stiffness of the compliant layer that converts force into
-# deflection. Estimating it costs (3-1)*(3-1) = 4 extra runs' worth
-# of information.
+# This is a LIST — uncomment/add the pairs you believe in, and re-run
+# compare_designs.py to watch the df cost and power price of each.
+# When include_interaction=True is passed anywhere, EVERY pair listed
+# here is added to the model. Each pair (a x b) costs
+# (len(a)-1)*(len(b)-1) extra df.
+#
+# Physics notes for THIS sensor (frequency shifts ~1/d^3 with the
+# coil-to-metal gap d, which the foam sets):
+#  * foam_material x foam_thickness — both set the compliant layer's
+#    stiffness (how far the metal moves per unit force). Costs 4 df.
+#  * foam_thickness x metal — the gap distance (set by thickness)
+#    steeply modulates how much the metal couples to the coil, so the
+#    metal's effect may be much larger at small gaps. Costs 4 df.
+#  * foam_thickness x coil — same gap argument, per coil geometry.
+#    Costs (3-1)*(n_coils-1) df.
 # ---------------------------------------------------------------
-PLAUSIBLE_INTERACTION = ("foam_material", "foam_thickness")
+INTERACTIONS = [
+    ("foam_material", "foam_thickness"),
+    ("foam_thickness", "metal"),
+    ("foam_thickness", "coil"),
+]
 
 # ---------------------------------------------------------------
 # Assumptions used ONLY by the power simulation (power_sim.py).

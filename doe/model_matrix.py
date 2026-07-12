@@ -41,7 +41,7 @@ columns ("dummy coding"). Fitting = ordinary least squares on X.
 import numpy as np
 import pandas as pd
 
-from factors import FACTORS, PLAUSIBLE_INTERACTION
+from factors import FACTORS, INTERACTIONS
 
 
 def build_model_matrix(design: pd.DataFrame, include_interaction: bool = False):
@@ -60,14 +60,15 @@ def build_model_matrix(design: pd.DataFrame, include_interaction: bool = False):
             columns.append((design[factor] == level).to_numpy(float))
             names.append(f"{factor}[{level}]")
 
-    # Optional interaction: products of the two factors' dummy columns
+    # Optional interactions: products of each configured pair's dummy
+    # columns. include_interaction=True adds EVERY pair in INTERACTIONS.
     if include_interaction:
-        fa, fb = PLAUSIBLE_INTERACTION
-        for la in FACTORS[fa][1:]:
-            for lb in FACTORS[fb][1:]:
-                col = ((design[fa] == la) & (design[fb] == lb)).to_numpy(float)
-                columns.append(col)
-                names.append(f"{fa}[{la}]:{fb}[{lb}]")
+        for fa, fb in INTERACTIONS:
+            for la in FACTORS[fa][1:]:
+                for lb in FACTORS[fb][1:]:
+                    col = ((design[fa] == la) & (design[fb] == lb)).to_numpy(float)
+                    columns.append(col)
+                    names.append(f"{fa}[{la}]:{fb}[{lb}]")
 
     return np.column_stack(columns), names
 
@@ -78,8 +79,8 @@ def model_df(include_interaction: bool = False) -> int:
     for levels in FACTORS.values():
         df += len(levels) - 1
     if include_interaction:
-        fa, fb = PLAUSIBLE_INTERACTION
-        df += (len(FACTORS[fa]) - 1) * (len(FACTORS[fb]) - 1)
+        for fa, fb in INTERACTIONS:
+            df += (len(FACTORS[fa]) - 1) * (len(FACTORS[fb]) - 1)
     return df
 
 
@@ -93,10 +94,10 @@ def print_df_accounting(n_runs: int, include_interaction: bool = False):
         print(f"  {factor + f' ({k} levels)':38s} costs {k-1:2d} df")
         total += k - 1
     if include_interaction:
-        fa, fb = PLAUSIBLE_INTERACTION
-        cost = (len(FACTORS[fa]) - 1) * (len(FACTORS[fb]) - 1)
-        print(f"  {fa} x {fb:20s} costs {cost:2d} df")
-        total += cost
+        for fa, fb in INTERACTIONS:
+            cost = (len(FACTORS[fa]) - 1) * (len(FACTORS[fb]) - 1)
+            print(f"  {fa + ' x ' + fb:38s} costs {cost:2d} df")
+            total += cost
     err = n_runs - total
     print(f"  {'-'*52}")
     print(f"  model total = {total} df  ->  error df = {n_runs} - {total} = {err}")
@@ -110,7 +111,9 @@ def print_df_accounting(n_runs: int, include_interaction: bool = False):
 
 
 if __name__ == "__main__":
+    from factors import INTERACTIONS
     print("Main-effects model:")
     print_df_accounting(20, include_interaction=False)
-    print("\nMain effects + foam_material x foam_thickness interaction:")
+    pairs = ", ".join(f"{a} x {b}" for a, b in INTERACTIONS)
+    print(f"\nMain effects + interactions ({pairs}):")
     print_df_accounting(25, include_interaction=True)

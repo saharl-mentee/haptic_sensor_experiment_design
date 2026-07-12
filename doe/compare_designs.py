@@ -18,11 +18,12 @@ D-optimal designs at N = 20/22/25, and the full factorial reference.
 import os
 import pandas as pd
 
-from factors import FACTORS, NOISE_CV, EFFECT_SIZE, ALPHA, full_factorial_size
+from factors import (FACTORS, INTERACTIONS, NOISE_CV, EFFECT_SIZE, ALPHA,
+                     full_factorial_size)
 from model_matrix import print_df_accounting, model_df
 from taguchi import ADAPTED
-from optimal import d_optimal, add_replicates, candidate_set
-from metrics import scorecard
+from optimal import d_optimal, add_replicates, augment_design, candidate_set
+from metrics import scorecard, d_efficiency
 from power_sim import power_table
 
 RESULTS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "results")
@@ -80,14 +81,82 @@ d22_me = d_optimal(22, include_interaction=False)
 designs["D-opt 25"] = (d_optimal(25, include_interaction=False), False)
 designs["D-opt 25 ME +3rep"] = (add_replicates(d22_me, 3, include_interaction=False), False)
 d22_int = d_optimal(22, include_interaction=True)
+d25_int = d_optimal(25, include_interaction=True)
 designs["D-opt 22 +int"] = (d22_int, True)
 designs["D-opt 25 +int +3rep"] = (add_replicates(d22_int, 3, include_interaction=True), True)
+d28_int = d_optimal(28, include_interaction=True)
+designs["D-opt 28"] = (d_optimal(28, include_interaction=False), False)
+designs["D-opt 28 +int"] = (d28_int, True)
+designs["D-opt 28 +int +3rep"] = (add_replicates(d25_int, 3, include_interaction=True), True)
+d35_int = d_optimal(35, include_interaction=True)
+designs["D-opt 35"] = (d35_int, False)
+designs["D-opt 35 +int"] = (d35_int, True)
 designs["Full factorial (ref)"] = (candidate_set(), True)
+
+# ------------------------------------------------------------------
+# 2b. Augmentation path — build in stages without wasting any run
+# ------------------------------------------------------------------
+banner("STEP 2b — Augmentation path (grow the design in stages)")
+print("""If you are unsure of the final build count, build a small D-optimal
+design now and ADD runs later WITHOUT discarding any. Fixing the earlier
+runs and optimizing only the additions guarantees the small design is
+NESTED inside the big one (so every sensor you already built still counts).
+The only price is a small drop in D-efficiency vs designing the big one
+from scratch — the 'decline' column below is exactly that price.\n""")
+
+KEYS = list(FACTORS)
+_AUG_STARTS = 12          # fewer restarts here to keep this section quick
+
+
+def _rowset(df):
+    return set(map(tuple, df[KEYS].to_numpy()))
+
+
+def augmentation_path(inter, stages, tag):
+    """Grow stages[0] -> stages[1] -> ... by augmentation; print the
+    efficiency decline vs from-scratch at each N. Returns {N: design}."""
+    print(f"  {tag}")
+    print(f"    {'N':>3}  {'D-eff scratch':>13}  {'D-eff augmented':>15}  "
+          f"{'decline':>8}  {'orig. runs kept':>15}")
+    first = base = d_optimal(stages[0], include_interaction=inter,
+                             n_starts=_AUG_STARTS)
+    prev, out = base, {}
+    for i, N in enumerate(stages):
+        scratch = d_optimal(N, include_interaction=inter, n_starts=_AUG_STARTS)
+        aug = base if i == 0 else augment_design(
+            prev, N - len(prev), include_interaction=inter, n_starts=_AUG_STARTS)
+        es, ea = d_efficiency(scratch, inter), d_efficiency(aug, inter)
+        kept = len(_rowset(first) & _rowset(aug))
+        print(f"    {N:>3}  {es:>12.1f}%  {ea:>14.1f}%  "
+              f"{es - ea:>6.1f}pt  {kept:>7}/{len(first)}")
+        out[N], prev = aug, aug
+    return out
+
+# Main-effects staged path — always affordable, always estimable.
+augmentation_path(False, [16, 20, 25], "Main-effects model:  16 -> 20 -> 25")
+
+# Interaction staged path — needs N > model params, so scale it to
+# however many interactions are enabled in factors.py right now.
+print()
+p_int = model_df(True)
+lo = max(20, p_int + 2)             # first stage: estimable, with error df
+int_stages = [lo, lo + 4, lo + 8]
+if int_stages[0] <= 28:
+    aug_int = augmentation_path(
+        True, int_stages,
+        f"Interaction model:  {int_stages[0]} -> {int_stages[1]} -> {int_stages[2]}"
+        f"  (needs {p_int} df for the model)")
+    # surface the augmented endpoint in the main scorecard/power tables
+    designs[f"D-opt {int_stages[-1]} aug +int"] = (aug_int[int_stages[-1]], True)
+else:
+    print(f"  Interaction model: skipped — the {len(INTERACTIONS)} interaction "
+          f"pair(s) enabled in factors.py need {p_int} df, too rich to augment")
+    print(f"  within ~28 builds. Enable fewer pairs to explore this path.")
 
 for name, (d, _) in designs.items():
     fn = os.path.join(RESULTS, f"design_{name.replace(' ', '_').replace('+','')}.csv")
     d.to_csv(fn, index=False)
-print(f"All design matrices saved to {os.path.abspath(RESULTS)}/design_*.csv")
+print(f"\nAll design matrices saved to {os.path.abspath(RESULTS)}/design_*.csv")
 
 # ------------------------------------------------------------------
 # 3. The scorecard

@@ -1,13 +1,18 @@
 design,runs,model,model df,error df,replicates,estimable,D-eff %,worst VIF,max |corr|,balance (runs/level)
-Taguchi L16,16,main effects,10,6,0,yes,95.0,1.5,0.33,coil:4-4  foamMat:4-8  thick:4-8  metal:4-8
-Taguchi L18,18,main effects,10,8,0,yes,97.7,1.33,0.5,coil:3-6  foamMat:6-6  thick:6-6  metal:6-6
-Taguchi L25,25,main effects,10,15,0,yes,93.8,1.2,0.41,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
-Taguchi L25 +int,25,ME+interaction,14,11,0,yes,79.9,8.21,0.59,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
-D-opt 20,20,main effects,10,10,0,yes,97.4,1.82,0.54,coil:4-6  foamMat:6-7  thick:6-7  metal:6-8
-D-opt 20 +int,20,ME+interaction,14,6,0,yes,89.8,5.97,0.57,coil:5-5  foamMat:6-7  thick:6-7  metal:6-7
-D-opt 16,16,main effects,10,6,0,yes,96.2,1.5,0.52,coil:3-5  foamMat:5-6  thick:5-6  metal:5-6
-D-opt 25,25,main effects,10,15,0,yes,99.0,1.59,0.51,coil:6-7  foamMat:8-9  thick:8-9  metal:8-9
-D-opt 25 ME +3rep,25,main effects,10,15,3,yes,98.5,1.54,0.56,coil:6-7  foamMat:7-9  thick:8-9  metal:8-9
-D-opt 22 +int,22,ME+interaction,14,8,0,yes,92.0,4.71,0.58,coil:5-6  foamMat:7-8  thick:7-8  metal:7-8
-D-opt 25 +int +3rep,25,ME+interaction,14,11,3,yes,90.6,4.67,0.59,coil:5-7  foamMat:8-9  thick:7-9  metal:8-9
-Full factorial (ref),108,ME+interaction,14,94,0,yes,100.0,4.0,0.5,coil:27-27  foamMat:36-36  thick:36-36  metal:36-36
+Taguchi L16,16,main effects,9,7,1,yes,92.7,1.12,0.33,coil:4-8  foamMat:4-8  thick:4-8  metal:4-8
+Taguchi L18,18,main effects,9,9,0,yes,100.0,1.33,0.5,coil:6-6  foamMat:6-6  thick:6-6  metal:6-6
+Taguchi L25,25,main effects,9,16,4,yes,93.7,1.2,0.41,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
+D-opt 20,20,main effects,9,11,0,yes,98.5,1.43,0.54,coil:6-7  foamMat:6-8  thick:6-7  metal:6-7
+D-opt 20 +int,20,ME+interaction,21,-1,0,NO,0.0,inf,1.0,coil:6-7  foamMat:5-8  thick:6-7  metal:6-8
+D-opt 16,16,main effects,9,7,0,yes,97.0,1.5,0.52,coil:5-6  foamMat:5-6  thick:5-6  metal:5-6
+D-opt 25,25,main effects,9,16,0,yes,98.8,1.4,0.51,coil:8-9  foamMat:7-9  thick:8-9  metal:8-9
+D-opt 25 ME +3rep,25,main effects,9,16,3,yes,98.2,1.4,0.51,coil:8-9  foamMat:8-9  thick:7-9  metal:8-9
+D-opt 22 +int,22,ME+interaction,21,1,0,yes,88.2,12.73,0.58,coil:6-8  foamMat:7-8  thick:7-8  metal:7-8
+D-opt 25 +int +3rep,25,ME+interaction,21,4,3,yes,85.7,11.9,0.59,coil:7-9  foamMat:7-9  thick:8-9  metal:7-11
+D-opt 28,28,main effects,9,19,0,yes,99.6,1.37,0.51,coil:9-10  foamMat:9-10  thick:9-10  metal:9-10
+D-opt 28 +int,28,ME+interaction,21,7,0,yes,99.1,9.46,0.51,coil:9-10  foamMat:9-10  thick:9-10  metal:9-10
+D-opt 28 +int +3rep,28,ME+interaction,21,7,3,yes,93.5,15.44,0.55,coil:8-12  foamMat:9-10  thick:9-10  metal:9-10
+D-opt 35,35,main effects,9,26,0,yes,98.1,1.47,0.55,coil:10-14  foamMat:11-12  thick:11-12  metal:10-14
+D-opt 35 +int,35,ME+interaction,21,14,0,yes,95.9,11.12,0.6,coil:10-14  foamMat:11-12  thick:11-12  metal:10-14
+Full factorial (ref),81,ME+interaction,21,60,0,yes,100.0,9.33,0.5,coil:27-27  foamMat:27-27  thick:27-27  metal:27-27
+D-opt 31 aug +int,31,ME+interaction,21,10,0,yes,97.2,10.75,0.56,coil:10-11  foamMat:9-12  thick:10-11  metal:9-12

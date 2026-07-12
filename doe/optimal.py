@@ -93,8 +93,12 @@ def d_optimal(n_runs: int, include_interaction: bool = False,
                     idx[pos], val = best_swap, best_swap_val
                     improved = True
 
-        # 4. keep the best restart
-        if val > best_val:
+        # 4. keep the best restart. The `best_idx is None` clause makes
+        #    the FIRST start always stick, so that even when every design
+        #    is singular (val = -inf, e.g. more model params than runs)
+        #    we still return a design instead of crashing on None. The
+        #    scorecard then flags it as not-estimable.
+        if best_idx is None or val > best_val:
             best_val, best_idx = val, list(idx)
 
     return cand.iloc[sorted(best_idx)].reset_index(drop=True)
@@ -127,6 +131,82 @@ def add_replicates(design: pd.DataFrame, n_replicates: int,
                 best_val, best_row = v, i
         out = pd.concat([out, design.iloc[[best_row]]], ignore_index=True)
     out["is_replicate"] = out.duplicated(subset=list(FACTORS), keep="first")
+    return out
+
+
+def augment_design(base: pd.DataFrame, n_add: int,
+                   include_interaction: bool = False,
+                   allow_replicates: bool = False,
+                   n_starts: int = 30, seed: int = 42) -> pd.DataFrame:
+    """
+    Grow an EXISTING design by n_add runs, keeping every base run.
+
+    This is "sequential" / "augmented" D-optimal design: you have
+    already committed to (or already built) the `base` runs, and now
+    want the best runs to ADD — the design that maximizes det(X'X) for
+    the combined set, subject to the base being fixed.
+
+    Why not just re-run d_optimal at the bigger N? Because that gives a
+    DIFFERENT set of runs (D-optimal designs are not nested), so your
+    already-built sensors might not be in it. Augmenting guarantees the
+    result CONTAINS the base -> you can build in stages, stop early if
+    the answer is already clear, or extend later without waste. The
+    price is a sliver of D-efficiency vs the from-scratch design.
+
+    allow_replicates=False -> the added runs are new, distinct combos
+    (also distinct from the base). True -> a base combo may be repeated
+    if that is what best raises det(X'X).
+
+    The math trick: the base contributes a fixed M0 = Xbase' Xbase to
+    the information matrix, so the combined X'X is just M0 plus the
+    added rows' contribution — we never re-touch the base while search.
+    """
+    cand = candidate_set()
+    Xcand, _ = build_model_matrix(cand, include_interaction)
+    Xbase, _ = build_model_matrix(base, include_interaction)
+    M0 = Xbase.T @ Xbase
+    rng = np.random.default_rng(seed)
+
+    def combined_logdet(add_idx):
+        Xa = Xcand[add_idx]
+        sign, val = np.linalg.slogdet(M0 + Xa.T @ Xa)
+        return val if sign > 0 else -np.inf
+
+    # candidate pool for the ADDED runs
+    if allow_replicates:
+        pool = list(range(len(cand)))
+    else:
+        base_keys = set(map(tuple, base[list(FACTORS)].to_numpy()))
+        pool = [i for i, row in enumerate(cand[list(FACTORS)].to_numpy())
+                if tuple(row) not in base_keys]
+
+    best_idx, best_val = None, -np.inf
+    for _ in range(n_starts):
+        idx = list(rng.choice(pool, size=n_add, replace=False))
+        val = combined_logdet(idx)
+        improved = True
+        while improved:
+            improved = False
+            outside = [i for i in pool if i not in set(idx)]
+            for pos in range(n_add):
+                current, best_swap, best_swap_val = idx[pos], None, val
+                for j in outside:
+                    idx[pos] = j
+                    v = combined_logdet(idx)
+                    if v > best_swap_val + 1e-10:
+                        best_swap, best_swap_val = j, v
+                idx[pos] = current
+                if best_swap is not None:
+                    outside.remove(best_swap)
+                    outside.append(idx[pos])
+                    idx[pos], val = best_swap, best_swap_val
+                    improved = True
+        if best_idx is None or val > best_val:
+            best_val, best_idx = val, list(idx)
+
+    added = cand.iloc[best_idx].reset_index(drop=True)
+    out = pd.concat([base.reset_index(drop=True), added], ignore_index=True)
+    out["is_augment"] = [False] * len(base) + [True] * n_add
     return out
 
 
