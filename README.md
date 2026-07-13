@@ -21,12 +21,22 @@ responses then says which factor levels matter. **The design question is which
 ```bash
 source ~/.venvs/haptic_doe/bin/activate     # created for this project
 cd doe
-python compare_designs.py                   # ~40 s, prints everything
+python compare_designs.py    # STUDY 1: Taguchi vs D-optimal across run counts
+python augment_study.py      # STUDY 2: augment a design + replicates + verdict
 ```
 
-Outputs land in `results/`: the scorecard (`comparison.csv`), per-factor power
-(`power.csv`), every candidate design as a CSV run list (`design_*.csv`), and
-the power-vs-N chart (`power_vs_N.png`).
+Two studies, each writing to its own subfolder:
+
+- **`compare_designs.py` → `results/comparison/`** — the initial head-to-head
+  of the two DOE *types* (Taguchi arrays vs D-optimal) across run counts, on
+  the main-effects model. Produces `scorecard.csv`, `power.csv`, a
+  `power_vs_N.png` chart, and every run list under `designs/`.
+- **`augment_study.py` → `results/augmented/`** — pick a base size (edit the
+  CONFIG block at the top: `BASE_N`, `ADD_RUNS`, `N_REPLICATES`,
+  `WITH_INTERACTION`, `TARGET_POWER`), grow it by augmentation (every base run
+  kept), optionally add replicate builds, and read a **sufficiency verdict**:
+  does every factor clear the target power for the physical effect you care
+  about? Produces `scorecard.csv`, `power.csv`, and run lists under `designs/`.
 
 **To test your own assumptions** (different noise level, smaller effect you
 want to detect, real material names): edit the constants in `doe/factors.py`
@@ -43,7 +53,10 @@ and re-run. **To score a design of your own** (e.g. a hand-tweaked CSV):
 | `doe/optimal.py` | D-optimal (Fedorov exchange) design search, with replicate support |
 | `doe/metrics.py` | The common scorecard: error df, balance, D-efficiency, VIF, correlation |
 | `doe/power_sim.py` | Monte-Carlo statistical power for any design |
-| `doe/compare_designs.py` | **The driver — run this** |
+| `doe/report.py` | Shared scorecard / power / save helpers used by both drivers |
+| `doe/compare_designs.py` | **Study 1 driver** — Taguchi vs D-optimal × run count |
+| `doe/augment_study.py` | **Study 2 driver** — augment + replicates + sufficiency verdict |
+| `doe/phase2_analysis_plan.md`, `doe/phase3_position_plan.md` | Roadmap for the later phases |
 
 Every module has a long plain-language explanation at the top and can be run
 alone (`python taguchi.py`) to explore just that piece.

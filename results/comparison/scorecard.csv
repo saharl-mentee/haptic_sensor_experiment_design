@@ -1,0 +1,11 @@
+design,runs,model,model df,error df,replicates,estimable,D-eff %,worst VIF,max |corr|,balance (runs/level)
+Taguchi L16,16,main effects,9,7,1,yes,92.7,1.12,0.33,coil:4-8  foamMat:4-8  thick:4-8  metal:4-8
+Taguchi L18,18,main effects,9,9,0,yes,100.0,1.33,0.5,coil:6-6  foamMat:6-6  thick:6-6  metal:6-6
+Taguchi L25,25,main effects,9,16,4,yes,93.7,1.2,0.41,coil:5-10  foamMat:5-10  thick:5-10  metal:5-10
+D-opt 16,16,main effects,9,7,0,yes,97.0,1.5,0.52,coil:5-6  foamMat:5-6  thick:5-6  metal:5-6
+D-opt 18,18,main effects,9,9,0,yes,100.0,1.33,0.5,coil:6-6  foamMat:6-6  thick:6-6  metal:6-6
+D-opt 20,20,main effects,9,11,0,yes,98.5,1.43,0.54,coil:6-7  foamMat:6-8  thick:6-7  metal:6-7
+D-opt 22,22,main effects,9,13,0,yes,98.4,1.29,0.46,coil:6-8  foamMat:6-8  thick:6-8  metal:6-8
+D-opt 25,25,main effects,9,16,0,yes,98.8,1.4,0.51,coil:8-9  foamMat:7-9  thick:8-9  metal:8-9
+D-opt 28,28,main effects,9,19,0,yes,99.6,1.37,0.51,coil:9-10  foamMat:9-10  thick:9-10  metal:9-10
+Full factorial (ref),81,main effects,9,72,0,yes,100.0,1.33,0.5,coil:27-27  foamMat:27-27  thick:27-27  metal:27-27

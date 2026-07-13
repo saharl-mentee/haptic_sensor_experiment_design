@@ -27,18 +27,18 @@ FACTORS = {
     # 5 truly different coil geometries. The 2 "mirror winding"
     # variants are NOT here on purpose: they will be tested later as
     # a small paired comparison against the winning configuration.
-    # "coil": ["C1", "C2", "C3", "C4", "C5"],
-    # "coil": ["C1", "C2", "C3", "C4"],
-    "coil": ["C1", "C2", "C3"],
+    # "coil": ["6", "8", "9", "10", "11"],
+    # "coil": ["6", "8", "9", "10"],
+    "coil": ["6", "8", "10"],
 
     # 3 candidate foam materials.
-    "foam_material": ["FoamA", "FoamB", "FoamC"],
+    "foam_material": ["H800", "H870", "Poron"],
 
     # 3 foam thicknesses. Physically this is a continuous quantity;
     # for CHOOSING which runs to build, we treat it as 3 levels
     # (same "cost" either way: 3 levels = 2 degrees of freedom).
     # In the final ANALYSIS we can fit it as a continuous trend.
-    "foam_thickness": ["T1", "T2", "T3"],
+    "foam_thickness": ["1.58", "2.39", "3.18"],
 
     # 3 metal sheet options. NOTE: material and thickness change
     # TOGETHER here (they are bundled into one factor), so the
