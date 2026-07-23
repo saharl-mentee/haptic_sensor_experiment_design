@@ -15,12 +15,14 @@ source ~/.venvs/haptic_doe/bin/activate   # venv lives OUTSIDE the repo (WSL hom
 cd doe
 python compare_designs.py                 # STUDY 1: Taguchi vs D-optimal x N -> ../results/comparison/
 python augment_study.py                   # STUDY 2: augment + replicates + sufficiency -> ../results/augmented/
+python diagnostics.py                     # RISK CHECK: correlation map + alias matrix -> ../results/diagnostics/
 python optimal.py                         # any module runs standalone as a demo/self-test
 ```
 
-Two Phase-0 driver scripts, each writing to its own `results/` subfolder:
+Driver scripts, each writing to its own `results/` subfolder:
 - `compare_designs.py` — the initial comparison of the two DOE *types* across run counts (main-effects model only, for a fair head-to-head).
-- `augment_study.py` — takes a chosen base size, grows it by augmentation (nested), optionally adds replicate builds, and prints a sufficiency verdict (does every factor clear the target power?). Edit its CONFIG block at the top (`BASE_N`, `ADD_RUNS`, `N_REPLICATES`, `WITH_INTERACTION`, `TARGET_POWER`).
+- `augment_study.py` — takes a chosen base size, grows it by augmentation (nested), optionally adds replicate builds, and prints a sufficiency verdict (does every factor clear the target power?). Edit its CONFIG block (`BASE_N`, `BASE_INTERACTION`, `ADD_TOTAL`, `ADDED_INTERACTION`, `N_REPLICATES`, `TARGET_POWER`). Supports *staged* modelling: a main-effects screening base grown into an interaction model, and an all-new-vs-with-replicates comparison at a fixed extra-build budget.
+- `diagnostics.py` — pre-test **risk check** on a chosen design (no data needed): a correlation color-map among the effects you'll fit, and an **alias matrix** showing how left-out 2-factor interactions would bias the fitted effects. Point its `DESIGN_CSV` at a saved run-list or let it build one from `N`/`FIT_INTERACTION`.
 
 There is no test suite, linter, or build. Verification = run both driver scripts end-to-end plus the inline asserts (orthogonality checks in `taguchi.py`, the Fedorov self-test in `optimal.py` which must recover the 3×3 full factorial at N=9).
 
@@ -28,15 +30,17 @@ Scripts must be run **from inside `doe/`** (modules import each other by bare na
 
 ## Architecture
 
-Dependency chain: `factors.py` → `model_matrix.py` → {`taguchi.py`, `optimal.py`} → `metrics.py`, `power_sim.py` → `report.py` (shared scorecard/power/save helpers) → {`compare_designs.py`, `augment_study.py`} (the two drivers).
+Dependency chain: `factors.py` → `model_matrix.py` → {`taguchi.py`, `optimal.py`} → `metrics.py`, `power_sim.py`, `diagnostics.py` → `report.py` (shared scorecard/power/save helpers) → {`compare_designs.py`, `augment_study.py`, `diagnostics.py`} (the drivers).
 
 `report.py` exists so both drivers score, simulate power, and save designs identically — the two studies stay directly comparable and neither re-implements reporting. Each driver writes to its own `results/<study>/` subfolder with a `designs/` dir of run-list CSVs plus `scorecard.csv`/`power.csv` (and a chart for the comparison study).
 
-- `factors.py` is the single source of truth: factor levels (placeholders C1–C5, FoamA–C, T1–T3, MetalA–C until real materials are known) and the power-simulation assumptions (`NOISE_CV`, `EFFECT_SIZE`). Everything downstream is generic over it.
+- `factors.py` is the single source of truth: factor levels, the configurable `INTERACTIONS` list (which 2-factor interactions the model may include), and the power-simulation assumptions (`NOISE_CV`, optional per-level `NOISE_CV_BY_LEVEL`, `EFFECT_SIZE`). Everything downstream is generic over it.
+- `model_matrix.build_model_matrix` uses **effect coding (+1/−1/0)**, not 0/1 dummy coding — interaction columns are the *product* of their parents' effect columns. This is deliberate: it removes the coding artifact that otherwise inflates interaction-model VIFs to ~10 (a good `+int` design now reads ~1–2). It does not change the design, D-efficiency, or power — only makes VIF/correlation honest. Don't revert to dummy coding.
+- `diagnostics.py` computes, from the design alone, a correlation matrix among fitted effects and an alias matrix `A = (X1'X1)⁻¹X1'X2` (left-out 2FI → bias on fitted effects); heat-maps use the project's diverging blue↔gray↔red palette.
 - All modules share the `FACTORS` dict **by object reference** — to swap factors temporarily (as `optimal._self_test` does), mutate it in place (`clear()` + `update()`), never reassign.
 - A "design" is just a pandas DataFrame with one row per sensor build and one column per factor. `metrics.scorecard()` and `power_sim.power_table()` accept any such DataFrame, including hand-edited CSVs.
 - `power_sim` rotates the injected effect across every level of a factor and averages — this is deliberate (fairness to unbalanced designs); don't "simplify" it back to a fixed level.
-- `results/comparison/` and `results/augmented/` are fully regenerated by their respective drivers and committed on purpose (the `designs/*.csv` files are the lab run lists).
+- `results/comparison/`, `results/augmented/`, and `results/diagnostics/` are fully regenerated by their respective drivers and committed on purpose (the `designs/*.csv` files are the lab run lists). Note: `.doc/.docx` and Office `~$*` lock files are gitignored — the user's evaluation documents are intentionally kept out of version control.
 
 ## Project state and roadmap
 
