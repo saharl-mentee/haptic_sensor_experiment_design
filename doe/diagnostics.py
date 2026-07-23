@@ -42,10 +42,10 @@ import report
 
 # ======================== CONFIG (edit me) ========================
 # Which design to risk-check? Either point at a saved run-list CSV...
-DESIGN_CSV      = "results/augmented/designs/base_N18.csv"       # e.g. "../results/augmented/designs/all-new_(10)_N28_int.csv"
+DESIGN_CSV      = "results/augmented/designs/base2rep_N20_[ME].csv"       # e.g. "../results/augmented/designs/all-new_(10)_N28_int.csv"
 # ...or (if DESIGN_CSV is "") build one fresh here:
 N               = 28
-FIT_INTERACTION = True     # the model you INTEND to fit after the experiment
+FIT_INTERACTION = False     # the model you INTEND to fit after the experiment
 SEED            = 50
 # ==================================================================
 

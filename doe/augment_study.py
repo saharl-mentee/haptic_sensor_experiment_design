@@ -36,16 +36,19 @@ import report
 # ======================== CONFIG (edit me) ========================
 BASE_N            = 18     # runs you commit to / build first
 BASE_INTERACTION  = False  # base MODEL: False = main effects only (screening)
-ADD_TOTAL         = 10     # total EXTRA builds beyond the base (same budget
+ADD_TOTAL         = 7     # total EXTRA builds beyond the base (same budget
                            # for BOTH options below, so they cost the same)
 ADDED_INTERACTION = True   # model AFTER adding runs: True = + interactions
                            # (the added runs are chosen to support THIS model)
-N_REPLICATES      = 3      # in the "with replicates" option, how many of the
+N_REPLICATES      = 0      # in the "with replicates" option, how many of the
                            # ADD_TOTAL extra builds are replicate duplicates
                            # instead of new distinct runs. So:
                            #   option A "all-new"  : ADD_TOTAL new distinct runs
                            #   option B "with-rep" : (ADD_TOTAL - N_REPLICATES)
                            #                         new runs + N_REPLICATES reps
+BASE_REPLICATES   = 2      # replicate builds added to the BASE itself (0 = off).
+                           # Shows a "base +Nrep" row so you can see what pure
+                           # error does for the base before any augmentation.
 TARGET_POWER      = 0.80   # a factor counts as "detectable" at/above this
 SEED              = 50
 # ==================================================================
@@ -87,6 +90,15 @@ report.banner("STEP 2 — Base (screening), then two ways to spend the extra bui
 base = d_optimal(BASE_N, include_interaction=BASE_INTERACTION, seed=SEED)
 print(f"  base: {BASE_N} runs, fits {base_label}")
 
+# Optional: replicate builds added to the BASE itself (independent of the
+# augmentation budget) — lets you see what pure error buys the base alone.
+base_rep = None
+if BASE_REPLICATES > 0:
+    base_rep = add_replicates(base[KEYS], BASE_REPLICATES,
+                              include_interaction=BASE_INTERACTION)
+    print(f"  base +rep: base +{BASE_REPLICATES} replicates -> {len(base_rep)} "
+          f"({base_label})")
+
 # Option A: all extra builds are NEW distinct runs, chosen for the ADDED model
 all_new = augment_design(base, ADD_TOTAL, include_interaction=ADDED_INTERACTION,
                          seed=SEED)
@@ -112,10 +124,14 @@ name_scratch = f"from-scratch N={FINAL_N} [+int]"
 
 designs = {                                   # name -> (DataFrame, include_interaction)
     name_base:    (base,     BASE_INTERACTION),
+}
+if base_rep is not None:
+    designs[f"base+{BASE_REPLICATES}rep N={len(base_rep)} [ME]"] = (base_rep, BASE_INTERACTION)
+designs.update({
     name_allnew:  (all_new,  ADDED_INTERACTION),
     name_withrep: (with_rep, ADDED_INTERACTION),
     name_scratch: (scratch,  ADDED_INTERACTION),
-}
+})
 
 report.save_designs(designs, OUT)
 print(f"\nDesign run-lists saved to {os.path.abspath(OUT)}/designs/")
