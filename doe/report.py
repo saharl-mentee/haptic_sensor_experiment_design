@@ -73,8 +73,8 @@ How to read the scorecard:
   replicates  duplicate builds -> direct measure of build-to-build noise.
   D-eff %     information per run vs the full factorial (higher = better).
   worst VIF   1.0 = effects perfectly separated; 2 = one effect's
-              uncertainty doubled by entanglement; >5 = trouble.
-              (+interaction rows show an elevated VIF even for the perfect
-              full-factorial design — a coding artifact; compare against
-              that reference row, not against 1.)
+              uncertainty doubled by entanglement; >5 = trouble. Factors
+              use EFFECT coding (+1/-1), so interaction terms are honest
+              here — a well-chosen +interaction design still reads ~1-2,
+              not the inflated ~10 that 0/1 dummy coding produces.
   max |corr|  0 = fully orthogonal design (the Taguchi ideal)."""

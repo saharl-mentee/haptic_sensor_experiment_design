@@ -1,5 +1,5 @@
 design,runs,model,model df,error df,replicates,estimable,D-eff %,worst VIF,max |corr|,balance (runs/level)
-base N=20,20,ME+interaction,21,-1,0,NO,0.0,inf,1.0,coil:6-7  foamMat:5-8  thick:6-7  metal:6-8
-augmented N=25,25,ME+interaction,21,4,0,yes,90.3,8.4,0.59,coil:6-11  foamMat:8-9  thick:7-9  metal:8-9
-augmented+3rep N=28,28,ME+interaction,21,7,3,yes,89.0,8.14,0.6,coil:7-13  foamMat:8-10  thick:9-10  metal:9-10
-from-scratch N=28,28,ME+interaction,21,7,0,yes,99.1,9.46,0.51,coil:9-10  foamMat:9-10  thick:9-10  metal:9-10
+base N=18 [ME],18,main effects,8,10,0,yes,100.0,1.33,0.5,coil:6-6  foamMat:6-6  thick:9-9  metal:6-6
+all-new (+10) N=28 [+int],28,ME+interaction,14,14,0,yes,96.2,1.58,0.56,coil:8-11  foamMat:9-10  thick:14-14  metal:8-11
+7new+3rep N=28 [+int],28,ME+interaction,14,14,3,yes,96.0,1.65,0.57,coil:8-11  foamMat:8-10  thick:13-15  metal:8-10
+from-scratch N=28 [+int],28,ME+interaction,14,14,0,yes,96.2,1.58,0.56,coil:8-11  foamMat:8-11  thick:14-14  metal:7-12

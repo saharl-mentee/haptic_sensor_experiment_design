@@ -34,7 +34,8 @@ import numpy as np
 import pandas as pd
 from scipy import stats
 
-from factors import FACTORS, NOISE_CV, EFFECT_SIZE, BASELINE, ALPHA
+from factors import (FACTORS, NOISE_CV, NOISE_CV_BY_LEVEL, EFFECT_SIZE,
+                     BASELINE, ALPHA)
 from model_matrix import build_model_matrix
 
 
@@ -43,6 +44,29 @@ def _fit_rss(X: np.ndarray, y: np.ndarray) -> float:
     beta, *_ = np.linalg.lstsq(X, y, rcond=None)
     r = y - X @ beta
     return float(r @ r)
+
+
+def run_noise_sigma(design: pd.DataFrame) -> np.ndarray:
+    """
+    Per-run response-noise SD (absolute, in BASELINE units), one value
+    per run. Combines the baseline NOISE_CV with any level-dependent
+    extra noise from factors.NOISE_CV_BY_LEVEL, in quadrature:
+
+        sigma_run = BASELINE * sqrt( NOISE_CV^2 + sum_f extra(level_f)^2 )
+
+    An empty NOISE_CV_BY_LEVEL -> constant NOISE_CV (original behaviour).
+    Only differences BETWEEN levels of the same factor make the noise
+    vary from run to run; equal extra-CVs across a factor's levels just
+    raise every run's noise by the same amount.
+    """
+    n = len(design)
+    var = np.full(n, NOISE_CV ** 2, dtype=float)
+    for factor, level_map in NOISE_CV_BY_LEVEL.items():
+        if factor not in design.columns:
+            continue
+        extra = design[factor].map(lambda lv: level_map.get(lv, 0.0)).to_numpy(float)
+        var = var + extra ** 2
+    return BASELINE * np.sqrt(var)
 
 
 def power_for_factor(design: pd.DataFrame, factor: str,
@@ -69,13 +93,14 @@ def power_for_factor(design: pd.DataFrame, factor: str,
     levels = FACTORS[factor]
     rng = np.random.default_rng(seed)
     f_crit = stats.f.ppf(1 - ALPHA, df_factor, df_err)
+    sigma = run_noise_sigma(design)          # per-run noise SD (may vary)
     sims_per_level = max(50, n_sims // len(levels))
     hits = total = 0
     for shifted in levels:
         truth = np.where(design[factor] == shifted,
                          BASELINE * (1 + EFFECT_SIZE), BASELINE)
         for _ in range(sims_per_level):
-            y = truth + rng.normal(0, NOISE_CV * BASELINE, size=n)
+            y = truth + rng.normal(0, 1, size=n) * sigma
             rss_full = _fit_rss(X_full, y)
             rss_red = _fit_rss(X_red, y)
             F = ((rss_red - rss_full) / df_factor) / (rss_full / df_err)

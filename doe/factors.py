@@ -38,13 +38,14 @@ FACTORS = {
     # for CHOOSING which runs to build, we treat it as 3 levels
     # (same "cost" either way: 3 levels = 2 degrees of freedom).
     # In the final ANALYSIS we can fit it as a continuous trend.
-    "foam_thickness": ["1.58", "2.39", "3.18"],
+    # "foam_thickness": ["1.58", "2.39", "3.18"],
+    "foam_thickness": ["1.58", "2.39"],
 
     # 3 metal sheet options. NOTE: material and thickness change
     # TOGETHER here (they are bundled into one factor), so the
     # experiment cannot say whether an effect came from the metal's
     # material or its thickness — only which sheet option is best.
-    "metal": ["MetalA", "MetalB", "MetalC"],
+    "metal": ["copper", "aluminum", "ss mesh"],
 }
 
 # ---------------------------------------------------------------
@@ -86,10 +87,40 @@ INTERACTIONS = [
 
 # How much does the response (e.g. sensitivity) vary between two
 # sensors built to the SAME spec, as a fraction of its value?
-# This is build-to-build + measurement noise combined.
+# This is the BASELINE build-to-build + measurement noise that every
+# run has, whatever its factor levels.
 # 0.10 = 10% coefficient of variation. If your fabrication is very
 # repeatable use 0.05; if it is crude, 0.15-0.20.
-NOISE_CV = 0.10
+NOISE_CV = 0.1
+
+# ---------------------------------------------------------------
+# OPTIONAL: selective (level-dependent) noise.
+#
+# Some parts of the build are more reproducible than others: a coil
+# PCB comes out nearly identical every time (~0 extra noise), while a
+# hand-cut soft foam may scatter a lot. List that EXTRA noise per
+# level here; it is ADDED (in quadrature) on top of NOISE_CV:
+#
+#   sigma_run = BASELINE * sqrt( NOISE_CV^2 + sum_f extra_cv(level_f)^2 )
+#
+# Rules:
+#  * A factor you don't list, or a level you don't list, adds 0 extra
+#    (so an empty dict {} reproduces the plain single-NOISE_CV behavior).
+#  * Only LEVEL-dependent differences change the statistics. A factor
+#    that adds the same extra noise to all its levels is mathematically
+#    just a bigger global NOISE_CV and won't change any comparison.
+#
+# Example (uncomment / edit):
+# NOISE_CV_BY_LEVEL = {
+#     "foam_material": {"FoamA": 0.03, "FoamC": 0.15},  # soft foam noisy
+#     "coil":          {"C1": 0.0, "C2": 0.0},          # PCB: no extra
+# }
+# NOISE_CV_BY_LEVEL = {"coil":{"6": 0.01, "8": 0.01, "10":0.01},
+#                      "foam_material":{"H800": 0.1, "H870": 0.1, "Poron":0.1},
+#                      "foam_thickness": {"1.58":0.3, "2.39":0.2, "3.18":0.15},
+#                      "metal": {"copper": 0.3, "aluminum":0.3, "ss mesh":0.2}
+# }
+NOISE_CV_BY_LEVEL = {}
 
 # The smallest difference between factor levels that you would care
 # about detecting, as a fraction of the baseline response.

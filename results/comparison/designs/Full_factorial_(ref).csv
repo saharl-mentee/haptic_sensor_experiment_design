@@ -1,82 +1,55 @@
 coil,foam_material,foam_thickness,metal
-C1,FoamA,T1,MetalA
-C1,FoamA,T1,MetalB
-C1,FoamA,T1,MetalC
-C1,FoamA,T2,MetalA
-C1,FoamA,T2,MetalB
-C1,FoamA,T2,MetalC
-C1,FoamA,Tfoam3,MetalA
-C1,FoamA,Tfoam3,MetalB
-C1,FoamA,Tfoam3,MetalC
-C1,FoamB,T1,MetalA
-C1,FoamB,T1,MetalB
-C1,FoamB,T1,MetalC
-C1,FoamB,T2,MetalA
-C1,FoamB,T2,MetalB
-C1,FoamB,T2,MetalC
-C1,FoamB,Tfoam3,MetalA
-C1,FoamB,Tfoam3,MetalB
-C1,FoamB,Tfoam3,MetalC
-C1,FoamC,T1,MetalA
-C1,FoamC,T1,MetalB
-C1,FoamC,T1,MetalC
-C1,FoamC,T2,MetalA
-C1,FoamC,T2,MetalB
-C1,FoamC,T2,MetalC
-C1,FoamC,Tfoam3,MetalA
-C1,FoamC,Tfoam3,MetalB
-C1,FoamC,Tfoam3,MetalC
-C2,FoamA,T1,MetalA
-C2,FoamA,T1,MetalB
-C2,FoamA,T1,MetalC
-C2,FoamA,T2,MetalA
-C2,FoamA,T2,MetalB
-C2,FoamA,T2,MetalC
-C2,FoamA,Tfoam3,MetalA
-C2,FoamA,Tfoam3,MetalB
-C2,FoamA,Tfoam3,MetalC
-C2,FoamB,T1,MetalA
-C2,FoamB,T1,MetalB
-C2,FoamB,T1,MetalC
-C2,FoamB,T2,MetalA
-C2,FoamB,T2,MetalB
-C2,FoamB,T2,MetalC
-C2,FoamB,Tfoam3,MetalA
-C2,FoamB,Tfoam3,MetalB
-C2,FoamB,Tfoam3,MetalC
-C2,FoamC,T1,MetalA
-C2,FoamC,T1,MetalB
-C2,FoamC,T1,MetalC
-C2,FoamC,T2,MetalA
-C2,FoamC,T2,MetalB
-C2,FoamC,T2,MetalC
-C2,FoamC,Tfoam3,MetalA
-C2,FoamC,Tfoam3,MetalB
-C2,FoamC,Tfoam3,MetalC
-C3,FoamA,T1,MetalA
-C3,FoamA,T1,MetalB
-C3,FoamA,T1,MetalC
-C3,FoamA,T2,MetalA
-C3,FoamA,T2,MetalB
-C3,FoamA,T2,MetalC
-C3,FoamA,Tfoam3,MetalA
-C3,FoamA,Tfoam3,MetalB
-C3,FoamA,Tfoam3,MetalC
-C3,FoamB,T1,MetalA
-C3,FoamB,T1,MetalB
-C3,FoamB,T1,MetalC
-C3,FoamB,T2,MetalA
-C3,FoamB,T2,MetalB
-C3,FoamB,T2,MetalC
-C3,FoamB,Tfoam3,MetalA
-C3,FoamB,Tfoam3,MetalB
-C3,FoamB,Tfoam3,MetalC
-C3,FoamC,T1,MetalA
-C3,FoamC,T1,MetalB
-C3,FoamC,T1,MetalC
-C3,FoamC,T2,MetalA
-C3,FoamC,T2,MetalB
-C3,FoamC,T2,MetalC
-C3,FoamC,Tfoam3,MetalA
-C3,FoamC,Tfoam3,MetalB
-C3,FoamC,Tfoam3,MetalC
+6,H800,1.58,copper
+6,H800,1.58,aluminum
+6,H800,1.58,ss mesh
+6,H800,2.39,copper
+6,H800,2.39,aluminum
+6,H800,2.39,ss mesh
+6,H870,1.58,copper
+6,H870,1.58,aluminum
+6,H870,1.58,ss mesh
+6,H870,2.39,copper
+6,H870,2.39,aluminum
+6,H870,2.39,ss mesh
+6,Poron,1.58,copper
+6,Poron,1.58,aluminum
+6,Poron,1.58,ss mesh
+6,Poron,2.39,copper
+6,Poron,2.39,aluminum
+6,Poron,2.39,ss mesh
+8,H800,1.58,copper
+8,H800,1.58,aluminum
+8,H800,1.58,ss mesh
+8,H800,2.39,copper
+8,H800,2.39,aluminum
+8,H800,2.39,ss mesh
+8,H870,1.58,copper
+8,H870,1.58,aluminum
+8,H870,1.58,ss mesh
+8,H870,2.39,copper
+8,H870,2.39,aluminum
+8,H870,2.39,ss mesh
+8,Poron,1.58,copper
+8,Poron,1.58,aluminum
+8,Poron,1.58,ss mesh
+8,Poron,2.39,copper
+8,Poron,2.39,aluminum
+8,Poron,2.39,ss mesh
+10,H800,1.58,copper
+10,H800,1.58,aluminum
+10,H800,1.58,ss mesh
+10,H800,2.39,copper
+10,H800,2.39,aluminum
+10,H800,2.39,ss mesh
+10,H870,1.58,copper
+10,H870,1.58,aluminum
+10,H870,1.58,ss mesh
+10,H870,2.39,copper
+10,H870,2.39,aluminum
+10,H870,2.39,ss mesh
+10,Poron,1.58,copper
+10,Poron,1.58,aluminum
+10,Poron,1.58,ss mesh
+10,Poron,2.39,copper
+10,Poron,2.39,aluminum
+10,Poron,2.39,ss mesh

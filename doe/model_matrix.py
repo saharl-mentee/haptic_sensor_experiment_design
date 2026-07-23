@@ -44,30 +44,58 @@ import pandas as pd
 from factors import FACTORS, INTERACTIONS
 
 
+def _effect_col(design: pd.DataFrame, factor: str, level: str, ref: str) -> np.ndarray:
+    """
+    One EFFECT-CODED (a.k.a. sum-to-zero / deviation) column for a
+    categorical factor:
+        +1  where the run is at `level`
+        -1  where the run is at the reference level `ref` (factor's first)
+         0  otherwise
+    Unlike 0/1 dummy coding, these columns sum to zero, so main effects
+    and their products (interactions) are nearly uncorrelated — which is
+    why the interaction-model VIFs report near 1-2 instead of ~10. The
+    design, its D-efficiency and its power are UNCHANGED (this is just a
+    different, invertible way to write the same model); only the VIF /
+    correlation numbers become honest instead of inflated by a coding
+    artifact.
+    """
+    col = np.zeros(len(design))
+    col[(design[factor] == level).to_numpy()] = 1.0
+    col[(design[factor] == ref).to_numpy()] = -1.0
+    return col
+
+
 def build_model_matrix(design: pd.DataFrame, include_interaction: bool = False):
     """
     design: DataFrame with one row per run and one column per factor
             (values are level names, e.g. 'C3', 'FoamB', ...).
     Returns (X, column_names): X is the (n_runs x n_params) matrix.
+
+    Categorical factors use EFFECT coding (+1/-1/0, see _effect_col), so
+    an interaction column is the PRODUCT of its two parents' effect
+    columns.
     """
     n = len(design)
     columns = [np.ones(n)]           # the intercept = overall mean
     names = ["intercept"]
 
-    # Main effects: k-1 dummy columns per factor (first level = reference)
+    # Main effects: k-1 effect-coded columns per factor (first level = reference)
     for factor, levels in FACTORS.items():
+        ref = levels[0]
         for level in levels[1:]:
-            columns.append((design[factor] == level).to_numpy(float))
+            columns.append(_effect_col(design, factor, level, ref))
             names.append(f"{factor}[{level}]")
 
-    # Optional interactions: products of each configured pair's dummy
+    # Optional interactions: the PRODUCT of the two factors' effect-coded
     # columns. include_interaction=True adds EVERY pair in INTERACTIONS.
     if include_interaction:
         for fa, fb in INTERACTIONS:
+            refa, refb = FACTORS[fa][0], FACTORS[fb][0]
             for la in FACTORS[fa][1:]:
+                col_a = _effect_col(design, fa, la, refa)
                 for lb in FACTORS[fb][1:]:
-                    col = ((design[fa] == la) & (design[fb] == lb)).to_numpy(float)
-                    columns.append(col)
+                    col_b = _effect_col(design, fb, lb, refb)
+                    columns.append(col_a * col_b)
                     names.append(f"{fa}[{la}]:{fb}[{lb}]")
 
     return np.column_stack(columns), names

@@ -1,0 +1,34 @@
+coil,foam_material,foam_thickness,metal,is_replicate
+6,H800,1.58,copper,False
+6,H800,2.39,aluminum,False
+6,H870,1.58,copper,False
+6,H870,2.39,ss mesh,False
+6,Poron,1.58,aluminum,False
+6,Poron,1.58,ss mesh,False
+6,Poron,2.39,copper,False
+8,H800,1.58,ss mesh,False
+8,H800,2.39,ss mesh,False
+8,H870,1.58,aluminum,False
+8,H870,2.39,copper,False
+8,Poron,1.58,copper,False
+8,Poron,1.58,ss mesh,False
+8,Poron,2.39,aluminum,False
+10,H800,1.58,aluminum,False
+10,H800,2.39,copper,False
+10,H870,1.58,ss mesh,False
+10,H870,2.39,aluminum,False
+10,Poron,1.58,copper,False
+10,Poron,2.39,copper,False
+10,Poron,2.39,ss mesh,False
+8,H800,2.39,copper,False
+10,H800,1.58,ss mesh,False
+10,Poron,1.58,aluminum,False
+6,H870,2.39,copper,False
+10,H870,1.58,copper,False
+6,H870,1.58,aluminum,False
+6,Poron,2.39,ss mesh,False
+8,H800,1.58,aluminum,False
+8,H870,2.39,ss mesh,False
+10,H800,2.39,ss mesh,False
+6,H800,2.39,aluminum,True
+10,H870,2.39,aluminum,True
